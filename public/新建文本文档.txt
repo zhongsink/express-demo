@@ -1,0 +1,101 @@
+https://developer.mozilla.org/
+form.parse(req, function (err,fields, files) {
+	console.log(util.inspect({fields: fields, files: files}));
+	fs.rename(files.file.path,newpath+files.file.name,function(err){
+		if(err){
+			console.log(err);
+			return ;
+			 }
+			 res.send("1");
+		 });
+
+作用域
+var a=1;
+~function asd(){
+  var b=2;
+  console.log(b);
+}()
+if(true){
+var c=1;
+}
+console.log(a);
+console.log(c);
+console.log(b);
+
+this指针
+
+console.log(this); 
+~function(){
+console.log(this); 
+}();
+var obj = {
+name:"name",
+showThis:function(){
+console.log(this);
+}
+};
+
+obj.showThis();
+
+闭包
+function c(){
+  var num = 0;
+  return {
+   count : function(){ return num++; },
+   reset : function(){ return num = 0; }
+  }
+ };
+ var f = c();
+ var s = c();
+ console.log(f.count()); 
+ console.log(s.count());
+ f.reset();
+ console.log(f.count());
+ console.log(s.count());
+
+arguments-->模拟重载
+
+function test(){
+ console.log(arguments[0]?arguments[0]:"Hello",arguments[1]?arguments[1]:"Hello")
+};
+test();
+test("This is firstValue => arguments[0].","This is secondValue => arguments[1].");
+
+
+对象原型链
+
+var Calculator = function (decimalDigits, tax) {
+            this.decimalDigits = decimalDigits;
+            this.tax = tax;
+        };
+Calculator.prototype = {
+            add: function (x, y) {
+                return x + y;
+            },
+
+            subtract: function (x, y) {
+                return x - y;
+            }
+        };
+
+
+
+模拟对象继承
+function Person (name, age) {
+            this.name = name;
+            this.age = age;
+        }
+Person.prototype.say = function(){
+    console.log('hello, my name is ' + this.name);
+};
+function Man(name, age) {
+    Person.apply(this, arguments);
+}
+Man.prototype = Object.create(Person.prototype);//a.
+Man.prototype.constructor = Man;//b.
+var man1 = new Man('dsv');
+var man2 = new Man('sf');
+man1.say() ;
+man2.say();
+
+console.log(man1.name+man2.name);
