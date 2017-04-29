@@ -1,9 +1,9 @@
 module.exports = [{
     user:"admin",
-    url: "https://github.com/zhongsink",
-    ImgUrl: "http://localhost:3000/images/project.png",
+    url: "https://zhongsink.github.io",
+    ImgUrl: "http://120.25.221.52/images/project.png",
     title: "个人主页",
-    githubURL: "https://github.com/zhongsink",
-    tags: ["blog", "rem"],
+    githubURL: "https://github.com/zhongsink/zhongsink.github.io",
+    tags: ["blog"],
     createAt: "2017-4-15"
 }]
