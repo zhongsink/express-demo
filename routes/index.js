@@ -15,19 +15,22 @@ router.get('/', function (req, res) {
 });
 
 router.get('/getItems', function (req, res) {
-    Article.find({ "user": "admin" }, function (err, result) {
-
-        if (err) console.log(err);
-        res.json(JSON.stringify(result));
-    });
+    try {
+        Article.find({ "user": "admin" }, function (err, result) {
+            if (err) throw err;
+            return res.json(JSON.stringify(result));
+        });
+    } catch (err) {
+        console.log(err);
+    }
 });
 router.post('/register', function (req, res) {
     let fields = req.fields;
     User.findOne({ user: fields.user }, (err, result) => {
         if (err || result) {
             // console.log(1)
-              res.json(JSON.stringify({ success: false }));
-              return;
+            res.json(JSON.stringify({ success: false }));
+            return;
         }
         else {
             User.create({
@@ -36,11 +39,11 @@ router.post('/register', function (req, res) {
             }, (err) => {
                 if (err) {
                     // console.log(2);
-                     res.json(JSON.stringify({ success: false }));
-                     return;
+                    res.json(JSON.stringify({ success: false }));
+                    return;
                 }
                 // console.log(3);
-                 return res.json(JSON.stringify({ success: true }));
+                return res.json(JSON.stringify({ success: true }));
             });
         }
     });
@@ -52,23 +55,24 @@ router.post('/signin', function (req, res) {
     User.findOne({ user: fields.user }, (err, result) => {
         // console.log(result);
         if (err || !result) {
-            console.log(1);
+            // console.log(1);
             res.json(JSON.stringify({ success: false }));
             return;
         }
         if (password === result.password) {
-            console.log(2)
+            // console.log(2)
+            req.session.user = fields.user ;
             return res.json(JSON.stringify({ success: true }));
         }
         else {
-            console.log(3)
+            // console.log(3)
             return res.json(JSON.stringify({ success: false }));
         }
     });
 
 });
 
-router.post('/insertItems', function (req, res) {
+router.post('/insertItem', function (req, res) {
 
     let fields = req.fields;
     Article.findOne({
@@ -77,79 +81,94 @@ router.post('/insertItems', function (req, res) {
     }, (err, result) => {
         // console.log(result);
         if (err || result) {
-            return res.json({ "success": false });
+            return res.json(JSON.stringify({ success: false }));
         }
         else {
-            Article.create(fields, function (err) {
+            Article.create({
+                user:"admin",
+                body: decodeURIComponent(fields.body),
+                created_at: fields.created_at,
+                updated_at: fields.updated_at,
+                labels: [{
+                    name: decodeURIComponent(fields.labels)
+                }],
+                hash: fields.hash,
+                title: decodeURIComponent(fields.title)
+
+            }, function (err) {
                 if (err) {
                     // console.log(err);
-                    res.json({ "success": false });
+                    res.json(JSON.stringify({ success: false }));
                     return;
                 }
                 else {
-                    return res.json({ "success": true });
+                    return res.json(JSON.stringify({ success: true }));
                 }
             });
         }
     });
 });
 
-router.post('/insertProjectItems', (req, res) => {
+router.post('/insertProject', (req, res) => {
 
     let fields = req.fields;
-    let files = req.files
-    Project.findOne({
-        title: fields.title
-    }, (err, result) => {
-        if (err || result) {
-            fs.unlink(files.img.path, (err) => {
-                if (err) {
-                    res.json({ "success": false });
-                    return;
-                }
-            });
-            if (err) {
-                res.json({ "success": false });
-                return;
-            }
-            else if (result)
-                return res.json({ "success": false });
-        } else {
-            // console.log(fields, files);
-            fs.rename(files.img.path, path.join(__dirname + "/../public/images/") + files.img.name, (err) => {
-                if (err) {
-                    res.json({ "success": false });
-                    return;
-                }
-                Project.create({
-                    user: fields.user,
-                    url: fields.url,
-                    ImgUrl: "http://120.25.221.52" + "/images/" + files.img.name,
-                    title: fields.title,
-                    githubURL: fields.githubUrl,
-                    tags: [fields.tags],
-                    createAt: fields.createAt
-                }, function (err) {
-                    if (err) {
-                        res.json({ "success": false });
-                        return;
-                    }
-                    else {
-                        return res.json({ "success": true });
-                    }
-                });
-            });
-        }
-    });
+    let files = req.files;
+    console.log(req.fields,req.files);
+    res.json(JSON.stringify({ success: true }));
+    // Project.findOne({
+    //     title: fields.title
+    // }, (err, result) => {
+    //     if (err || result) {
+    //         fs.unlink(files.img.path, (err) => {
+    //             if (err) {
+    //                 res.json(JSON.stringify({ success: false }));
+    //                 return;
+    //             }
+    //         });
+    //         if (err) {
+    //             res.json(JSON.stringify({ success: false }));
+    //             return;
+    //         }
+    //         else if (result)
+    //             return res.json(JSON.stringify({ success: false }));
+    //     } else {
+    //         // console.log(fields, files);
+    //         fs.rename(files.img.path, path.join(__dirname + "/../public/images/") + files.img.name, (err) => {
+    //             if (err) {
+    //                 res.json(JSON.stringify({ success: false }));
+    //                 return;
+    //             }
+    //             Project.create({
+    //                 user: "admin",
+    //                 url: fields.url,
+    //                 ImgUrl: "http://www.inkera.cn" + "/images/" + files.img.name,
+    //                 title: fields.title,
+    //                 githubURL: fields.githubURL,
+    //                 tags: [fields.tags],
+    //                 createAt: fields.createAt
+    //             }, function (err) {
+    //                 if (err) {
+    //                     res.json(JSON.stringify({ success: false }));
+    //                     return;
+    //                 }
+    //                 else {
+    //                     return res.json(JSON.stringify({ success: true }));
+    //                 }
+    //             });
+    //         });
+    //     }
+    // });
 });
 
 router.get('/getProjectItem', function (req, res) {
-    Project.find({ "user": "admin" }, function (err, result) {
-
-        if (err) console.log(err);
-        res.json(JSON.stringify(result));
-    });
-
+    try {
+        Project.find({ "user": "admin" }, function (err, result) {
+            if (err) throw err;
+            return res.json(JSON.stringify(result));
+        });
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 
